@@ -7,7 +7,7 @@ class Horse(Process):
     def __init__(self, points, iD, kD, vectors_UID, tree_UID, maxsize, pipe, lock, 
         distance_function=(lambda v: norm(v)),
         vector_function=(lambda p,n: p-n),
-        attractor_function=(lambda i,v: normalize(v))
+        attractor_function=(lambda i,dv: normalize(dv))
         ):
         super(Horse, self).__init__()
         
@@ -46,8 +46,11 @@ class Horse(Process):
             res = self.compute(*self.batch.args)
             self.pipe.send(res)
             self.batch = self.pipe.recv()
-
         
+        self.vectors_sm.close()
+        self.tree_sm.close()
+
+    @jit
     def compute(self, start, end, trunk_mode):
         active_points = 0
         result = []

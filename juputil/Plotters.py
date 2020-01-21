@@ -90,8 +90,8 @@ def tree_plot(T, show_edges=True, show_nodes=True, show_leaves=False, show_branc
     fig = go.Figure(data=[node_data, line_data])
 
     fig.update_layout(
-        width=1200,
-        height=1200,
+        width=800,
+        height=600,
         autosize=False,
         scene=dict(
             camera=dict(
@@ -189,8 +189,8 @@ def dist_plot(D, name='', psize=1):
     fig = go.Figure(data=scat)
     fig.update_layout(
         title=name,
-        width=1200,
-        height=700,
+        width=800,
+        height=600,
         autosize=False,
         scene=dict(
             camera=dict(
