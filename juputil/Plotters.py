@@ -44,7 +44,7 @@ def tree_plot(T, show_edges=True, show_nodes=True, show_leaves=False, show_branc
         if show_nodes:
             addpoint(T.nodes[i])
             mark_w.append(T.w[i]/w0*25)
-            mark_colors.append(i)
+            mark_colors.append(i/T.end)
             continue
 
 
