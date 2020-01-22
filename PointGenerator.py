@@ -23,7 +23,7 @@ class PointGenerator:
     def cube(cls, N=100, D=1.0, C=vector(0,0,0)):
         return D*(rand(N,3)-0.5) + C
     
-    '''Uniform distributin in sphere'''
+    '''Uniform distribution in sphere'''
     @classmethod
     def sphere(cls, N=100, R=1.0, C=vector(0,0,0)):
         phi = rand(N)*cls.two_pi

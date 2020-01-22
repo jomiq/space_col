@@ -22,8 +22,17 @@ bl_info = {
     "category" : "Add Curve"
 }
 
+
+import os
+import sys 
+dir = os.path.dirname('.')
+if not dir in sys.path:
+    sys.path.append(dir)
+
 import bpy
+
 from .space_col_op import SC_OT_add_space_col
+
 
 def add_object_button(self, context):
     self.layout.operator(

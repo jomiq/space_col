@@ -50,7 +50,6 @@ class Horse(Process):
         self.vectors_sm.close()
         self.tree_sm.close()
 
-    @jit
     def compute(self, start, end, trunk_mode):
         active_points = 0
         result = []

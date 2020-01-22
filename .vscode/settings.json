@@ -11,5 +11,6 @@
     "workbench.colorCustomizations": {
         "statusBar.background" : "#806800"
     },
-    "python.pythonPath": "/home/jomik/miniconda3/envs/blender/bin/python"
+    "python.pythonPath": "/home/jomik/anaconda3/envs/blender/bin/python",
+    "python.dataScience.jupyterServerURI": "local"
 }
