@@ -1,93 +1,149 @@
 import plotly.graph_objects as go
-from SCA.util import norm as norm
+from numpy.linalg import norm as norm
+def decimate_tree(T):
+    edges = []
+    def walk(i):
+        for j in T.children[i]:
+            edges.append((i,j))
+            walk(j)
+    
+    return edges
 
-def tree_plot(T, show_edges=True, show_nodes=True, show_leaves=False, show_branching=False, node_w=True):
+def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=True, show_branching=False, decimate=False):
     '''Works > Efficient'''
-    x = T.nodes[:T.end,0]
-    y = T.nodes[:T.end,1]
-    z = T.nodes[:T.end,2]
+    if decimate:
+        show_nodes = False
+        show_branching = True
+
+    nodes = []
+    node_w = pointsize * T.w/max(T.w)
+    nodes_labels = []
+    nodes_color = []
+
+    leaves = []
+    leaves_labels = []
     
-    nx = []
-    ny = []
-    nz = []
 
+    branches = []
+    branches_w = []
+    branches_color = []
+    branches_labels = []
 
+    for i, n in enumerate(T.nodes[:T.end]):
+        nchild = len(T.children[i])
+        
+        if show_nodes:
+            nodes.append(n)
+            nodes_labels.append(f'N{i}')
+            nodes_color.append(i/len(nodes)) 
 
-    def addpoint(v):
-        nx.append(v[0])
-        ny.append(v[1])
-        nz.append(v[2])
-    
+        if nchild == 0:
+            leaves.append(n)
+            leaves_labels.append(f'L{i}')
+
+        elif nchild > 1:
+            branches.append(n)
+            branches_w.append(node_w[i] + 3)
+            branches_labels.append(f'{i}:{nchild}')
+            branches_color.append(nchild)
+        
     x_lines = []
     y_lines = []
     z_lines = []
-    
-    mark_colors = []
-    mark_w = []
-    
-    line_colors = []
-    line_w = []
-    
-    w0 = T.w[0]
-    
-    for i in range(T.end):
-        if show_leaves and len(T.children[i]) == 0:
-            addpoint(T.nodes[i])
-            mark_w.append(10)
-            mark_colors.append('green')
-            continue
-        if show_branching != 0 and len(T.children[i]) > show_branching:
-            addpoint(T.nodes[i])
-            mark_w.append(5)
-            mark_colors.append('blue')
-            continue
-        if show_nodes:
-            addpoint(T.nodes[i])
-            mark_w.append(T.w[i]/w0*25)
-            mark_colors.append(i/T.end)
-            continue
 
-
+    edges = []
     if show_edges:
-    #create the coordinate list for the lines
-        for e in T.edges:
-            for i in range(2):
-                x_lines.append(x[e[i]])
-                y_lines.append(y[e[i]])
-                z_lines.append(z[e[i]])
-            x_lines.append(None)
-            y_lines.append(None)
-            z_lines.append(None)
+        if decimate:
+            edges = decimate_tree(T)
+        else:
+            edges = T.edges
+
+        if show_edges:
+            x = T.nodes[:T.end, 0]
+            y = T.nodes[:T.end, 1]
+            z = T.nodes[:T.end, 2]
+        # oh my this hack sucks
+            for e in edges:
+                for i in range(2):
+                    x_lines.append(x[e[i]])
+                    y_lines.append(y[e[i]])
+                    z_lines.append(z[e[i]])
+                x_lines.append(None)
+                y_lines.append(None)
+                z_lines.append(None)
 
     
-    #marker
-    mark = dict(
+    # markers
+    node_mark = dict(
             symbol='circle',
-            size=mark_w,
-            color=mark_colors,           # set color to an array/list of desired values
+            size=node_w,
+            color=nodes_color,           # set color to an array/list of desired values
             colorscale='Portland',          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
-                color='DarkSlateGrey')
-        )
+            color='DarkSlateGrey')
+    )
+ 
+    leaf_mark = dict(
+            symbol='circle',
+            size=pointsize/2,
+            color='green',           # set color to an array/list of desired values
+            colorscale='Portland',          # choose a colorscale
+            opacity=1.0,
+            line=dict(width=0,
+            color='DarkSlateGrey')
+    )
+
+    branches_mark = dict(
+            symbol='circle',
+            size=branches_w,
+            color='green',           # set color to an array/list of desired values
+            colorscale='Portland',          # choose a colorscale
+            opacity=1.0,
+            line=dict(width=0,
+            color='DarkSlateGrey')
+    )
     
     linedict = dict(
         color='black',
         width=2
     )
-    
-    node_data = go.Scatter3d(x=nx, y=ny, z=nz, mode='markers', marker=mark, name='Node')
-    line_data = go.Scatter3d(
-        x=x_lines,
-        y=y_lines,
-        z=z_lines,
-        mode='lines',
-        name='Edge',
-        line=linedict
-        
-    )
 
-    fig = go.Figure(data=[node_data, line_data])
+    res_data = []
+    def myzip(V):
+        return [v[0] for v in V], [v[1] for v in V], [v[0] for v in V]
+    if show_nodes:
+        X = myzip(nodes)
+        res_data.append(go.Scatter3d(x=X[0], y=X[1], z=X[2], \
+            name='Nodes',
+            text=nodes_labels,
+            mode='markers', 
+            marker=node_mark))    
+    if show_leaves:
+        X = myzip(leaves)
+        res_data.append(go.Scatter3d(x=X[0], y=X[1], z=X[2], \
+            name='Leaf',
+            text=leaves_labels,
+            mode='markers',
+            marker=leaf_mark))
+    if show_branching:
+        X = myzip(branches)
+        res_data.append(go.Scatter3d(x=X[0], y=X[1], z=X[2], \
+            name='Branching nodes',
+            text=branches_labels,
+            mode='markers',
+            marker=branches_mark))
+    if show_edges:
+        res_data.append(go.Scatter3d(x=x_lines, y=y_lines, z=z_lines, \
+            name='Edge',
+            mode='lines',
+            line=linedict))
+
+ 
+
+
+
+    fig = go.Figure(data=res_data)
 
     fig.update_layout(
         width=800,
@@ -181,7 +237,7 @@ def dist_plot(D, name='', psize=1):
             colorscale='Portland',   # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
-                color='DarkSlateGrey')
+            color='DarkSlateGrey')
         )
     
     scat = go.Scatter3d(x=D[:,0], y=D[:,1], z=D[:,2],

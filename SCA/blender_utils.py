@@ -12,5 +12,7 @@ def to_mesh(T:SpaceColony, start=-1, end=-1):
     verts = [(T.nodes[i,0]), T.nodes[i,1], T.nodes[i,2]) for i in range(start, end)]
     edges = T.edges
     
-    mesh = bpy.data.meshes.new('tree')
+    mesh = bpy.data.meshes.new("tree")
     mesh.from_pydata(verts, T.edges, [])
+
+def get_
