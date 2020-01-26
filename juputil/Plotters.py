@@ -1,11 +1,30 @@
 import plotly.graph_objects as go
 from numpy.linalg import norm as norm
-def decimate_tree(T):
+def decimate_four(T):
     edges = []
     def walk(i):
         for j in T.children[i]:
             edges.append((i,j))
             walk(j)
+    
+    for i in range(T.nroots):
+        walk(i)
+
+    return edges
+
+def decimate_tree(T):
+    edges = []
+    def walk(i):
+        if len(T.children[i]) == 1:
+            return walk(T.children[i][0])
+        elif len(T.children[i]) > 1:
+            for c in T.children[i]:
+                edges.append((i, walk(c)))
+
+        return i
+    
+    for i in range(T.nroots):
+        walk(i)
     
     return edges
 
@@ -19,6 +38,8 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
     node_w = pointsize * T.w/max(T.w)
     nodes_labels = []
     nodes_color = []
+
+    max_children = max([len(c) for c in T.children])
 
     leaves = []
     leaves_labels = []
@@ -35,7 +56,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
         if show_nodes:
             nodes.append(n)
             nodes_labels.append(f'N{i}')
-            nodes_color.append(i/len(nodes)) 
+            nodes_color.append(i/T.end) 
 
         if nchild == 0:
             leaves.append(n)
@@ -45,7 +66,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             branches.append(n)
             branches_w.append(node_w[i] + 3)
             branches_labels.append(f'{i}:{nchild}')
-            branches_color.append(nchild)
+            branches_color.append(nchild/max_children)
         
     x_lines = []
     y_lines = []
@@ -58,19 +79,18 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
         else:
             edges = T.edges
 
-        if show_edges:
-            x = T.nodes[:T.end, 0]
-            y = T.nodes[:T.end, 1]
-            z = T.nodes[:T.end, 2]
-        # oh my this hack sucks
-            for e in edges:
-                for i in range(2):
-                    x_lines.append(x[e[i]])
-                    y_lines.append(y[e[i]])
-                    z_lines.append(z[e[i]])
-                x_lines.append(None)
-                y_lines.append(None)
-                z_lines.append(None)
+        x = T.nodes[:T.end, 0]
+        y = T.nodes[:T.end, 1]
+        z = T.nodes[:T.end, 2]
+        # oh this hack sucks
+        for e in edges:
+            for i in range(2):
+                x_lines.append(x[e[i]])
+                y_lines.append(y[e[i]])
+                z_lines.append(z[e[i]])
+            x_lines.append(None)
+            y_lines.append(None)
+            z_lines.append(None)
 
     
     # markers
@@ -86,7 +106,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
  
     leaf_mark = dict(
             symbol='circle',
-            size=pointsize/2,
+            size=pointsize/5,
             color='green',           # set color to an array/list of desired values
             colorscale='Portland',          # choose a colorscale
             opacity=1.0,
@@ -97,7 +117,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
     branches_mark = dict(
             symbol='circle',
             size=branches_w,
-            color='green',           # set color to an array/list of desired values
+            color=branches_color,           # set color to an array/list of desired values
             colorscale='Portland',          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
@@ -111,7 +131,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
 
     res_data = []
     def myzip(V):
-        return [v[0] for v in V], [v[1] for v in V], [v[0] for v in V]
+        return [v[0] for v in V], [v[1] for v in V], [v[2] for v in V]
     if show_nodes:
         X = myzip(nodes)
         res_data.append(go.Scatter3d(x=X[0], y=X[1], z=X[2], \
@@ -240,7 +260,15 @@ def dist_plot(D, name='', psize=1):
             color='DarkSlateGrey')
         )
     
-    scat = go.Scatter3d(x=D[:,0], y=D[:,1], z=D[:,2],
+    xp = []
+    yp = []
+    zp = []
+    for v in D:
+        xp.append(v[0])
+        yp.append(v[1])
+        zp.append(v[2])
+
+    scat = go.Scatter3d(x=xp, y=yp, z=zp,
               marker=mark, mode='markers')
     fig = go.Figure(data=scat)
     fig.update_layout(

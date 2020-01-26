@@ -1,5 +1,4 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
+
 # %%
 from IPython import get_ipython
 
@@ -50,7 +49,10 @@ get_ipython().run_cell_magic('time', '', 'T.iterate(80)\nT.walk()')
 
 
 # %%
-T_plot(T)
+T_plot(T, decimate=True)
+
+# %% 
+T_plot(T, pointsize=20)
 
 
 # %%
@@ -68,7 +70,7 @@ pts_tmp = PG.sphere_rad_gauss(30, 0.5, 0.01, v)
 pts4 = [p for p in pts_tmp if p[2] > 1.0]
 
 pts = np.concatenate((pts1, pts2, pts3, pts4))
-D_plot(pts, psize=2)
+# D_plot(pts, psize=2)
 
 
 # %%
@@ -77,8 +79,13 @@ par = Param(0.05, 0.7, 0.2, normalize(vec(0.0,0.0,1)))
 T = SCA.SpaceColony(pts, parameters=par, trunk_lim=45, min_activation=41)
 T.iterate(1000)
 T.walk()
+
+# %%
 T_plot(T)
 
+# %% 
+
+T_plot(T, decimate=True)
 
 # %%
 S_plot(T, True)
@@ -86,30 +93,26 @@ S_plot(T, True)
 
 # %%
 # Stress test
-pts = [p for p in PG.sphere_rad_gauss(N=20000, mu=1.0, sigma=0.05, C=vec(0,0,1)) if p[1] < 1.5]
+pts = [p for p in PG.sphere_rad_gauss(N=10000, mu=1.0, sigma=0.05, C=vec(0,0,1)) if p[1] < 0.8]
 
-par = Param(0.04, 0.3, 0.08, bias=vec(0,-1,0))
-T = SCA.SpaceColony(points=pts, parameters=par, roots=np.array([[0,0,0], [0,0,2]]), trunk_lim=30, maxsize=1000000, min_activation=100, yeet_condition=24)
+par = Param(0.05, 0.4, 0.12, bias=vec(0,-0.7,0))
+T = SCA.SpaceColony(points=pts, parameters=par, roots=np.array([[0,0,-0.3], [0,0,1.7]]), trunk_lim=30, maxsize=1000000, min_activation=20, yeet_condition=24)
+
+# %%
+D_plot(pts)
+
+# %%
+get_ipython().run_cell_magic('time', '', 'T.iterate(800)\nT.walk()')
 
 
 # %%
-T.iterate(3000)
+
+T_plot(T, pointsize=20)
+
+# %%
+T_plot(T, decimate=True)
+
 
 
 # %%
-T.walk()
-T_plot(T)
-
-
-# %%
-print(T)
-
-
-# %%
-get_ipython().run_cell_magic('time', '', 'T.walk()')
-
-
-# %%
-T_plot(T)
-
-
+S_plot(T, True)
