@@ -75,7 +75,7 @@ pts = np.concatenate((pts1, pts2, pts3, pts4))
 
 # %%
 from SCA.util import normalize
-par = Param(0.05, 0.7, 0.2, normalize(vec(0.0,0.0,1)))
+par = Param(0.05, 0.7, 0.2, vec(0.0,0.0,1))
 T = SCA.SpaceColony(pts, parameters=par, trunk_lim=45, min_activation=41)
 T.iterate(1000)
 T.walk()

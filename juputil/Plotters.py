@@ -65,7 +65,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
         elif nchild > 1:
             branches.append(n)
             branches_w.append(node_w[i] + 3)
-            branches_labels.append(f'{i}:{nchild}')
+            branches_labels.append(f'N{i}:C{nchild}')
             branches_color.append(nchild/max_children)
         
     x_lines = []
@@ -98,7 +98,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             symbol='circle',
             size=node_w,
             color=nodes_color,           # set color to an array/list of desired values
-            colorscale='Portland',          # choose a colorscale
+            colorscale='Blackbody',          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')
@@ -108,7 +108,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             symbol='circle',
             size=pointsize/5,
             color='green',           # set color to an array/list of desired values
-            colorscale='Portland',          # choose a colorscale
+            colorscale='Blackbody',          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')
@@ -118,7 +118,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             symbol='circle',
             size=branches_w,
             color=branches_color,           # set color to an array/list of desired values
-            colorscale='Portland',          # choose a colorscale
+            colorscale='Blackbody',          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')
@@ -159,16 +159,13 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             mode='lines',
             line=linedict))
 
- 
-
-
-
     fig = go.Figure(data=res_data)
 
     fig.update_layout(
-        width=800,
-        height=600,
+        width=1500,
+        height=900,
         autosize=False,
+        margin=dict(r=20, l=10, b=10, t=10),
         scene=dict(
             camera=dict(
                 up=dict(
@@ -183,19 +180,19 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
                 ),
             ),
             xaxis = dict(
-                 backgroundcolor="rgb(255, 255, 255)",
-                 gridcolor="white",
-                 showbackground=False,
-                 zerolinecolor="white",
+                backgroundcolor="rgb(255, 255, 255)",
+                gridcolor="white",
+                showbackground=False,
+                zerolinecolor="white",
                 ),
             yaxis = dict(
                 backgroundcolor="rgb(255, 255, 255)",
-                 gridcolor="white",
-                 showbackground=False,
-                 zerolinecolor="white",
+                gridcolor="white",
+                showbackground=False,
+                zerolinecolor="white",
                 ),
             zaxis = dict(
-                backgroundcolor="rgb(230, 230,200)",
+                backgroundcolor="rgba(230, 230, 230, 128)",
                 gridcolor="white",
                 showbackground=True,
                 zerolinecolor="white",
@@ -205,7 +202,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             aspectmode = 'data'
         )
     )
-    
+
     fig.show()
     
 def stat_plot(T, normal_to_size=False):
@@ -254,7 +251,7 @@ def dist_plot(D, name='', psize=1):
             symbol='circle',
             size=psize,
             color=c,                # set color to an array/list of desired values
-            colorscale='Portland',   # choose a colorscale
+            colorscale='Blackbody',   # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')

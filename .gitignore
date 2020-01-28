@@ -1,4 +1,6 @@
 __pycache__/*
 SCA/__pycache__/*
 juputil/__pycache__/*
+juputil/.*
+test_ipy/.*
 .vscode/*

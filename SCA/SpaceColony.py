@@ -111,6 +111,7 @@ class SpaceColony:
         
         for w in self.workers:
             w.join(1)
+            w.terminate()
         self.pipes = []
         self.workers = []
         self.running = False
