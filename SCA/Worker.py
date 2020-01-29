@@ -5,7 +5,7 @@ from .util import *
 
 class Horse(Process):
     def __init__(self, points, iD, kD, vectors_UID, tree_UID, maxsize, pipe, lock, 
-        distance_function=(lambda v: norm(v)),
+        distance_function=(lambda v: np.sum(v**2)),
         vector_function=(lambda p,n: p-n),
         attractor_function=(lambda i,dv: normalize(dv))
         ):
@@ -18,6 +18,10 @@ class Horse(Process):
         self.points = points
         self.iD = iD
         self.kD = kD
+
+        self._iD = iD**2
+        self._kD = kD**2
+
         self.maxsize = maxsize
 
         self.reached_bool = np.zeros(len(points), dtype=bool)
@@ -62,7 +66,7 @@ class Horse(Process):
                     dv = self.vector_function(p,n)
                     L = self.distance_function(dv)
                     
-                    if L < self.kD:
+                    if L < self._kD:
                         self.reached_points += 1
                         self.reached_bool[i] = True
                         break
@@ -73,7 +77,7 @@ class Horse(Process):
                         self.dv[i] = dv
 
                 if not self.reached_bool[i]:                        
-                    if self.L[i] < self.iD:
+                    if self.L[i] < self._iD:
                         active_points += 1
                         result.append(self.closest[i])
                         self.protected_add(self.closest[i], self.attractor_function(i, self.dv[i]))

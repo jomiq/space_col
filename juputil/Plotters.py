@@ -28,8 +28,8 @@ def decimate_tree(T):
     
     return edges
 
-def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=True, show_branching=False, decimate=False):
-    '''Works > Efficient'''
+def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=True, show_branching=False, decimate=False, plot_size=(800,800), color_scale='Portland'):
+    
     if decimate:
         show_nodes = False
         show_branching = True
@@ -98,7 +98,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             symbol='circle',
             size=node_w,
             color=nodes_color,           # set color to an array/list of desired values
-            colorscale='Blackbody',          # choose a colorscale
+            colorscale=color_scale,          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')
@@ -108,7 +108,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             symbol='circle',
             size=pointsize/5,
             color='green',           # set color to an array/list of desired values
-            colorscale='Blackbody',          # choose a colorscale
+            colorscale=color_scale,          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')
@@ -118,7 +118,7 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
             symbol='circle',
             size=branches_w,
             color=branches_color,           # set color to an array/list of desired values
-            colorscale='Blackbody',          # choose a colorscale
+            colorscale=color_scale,          # choose a colorscale
             opacity=1.0,
             line=dict(width=0,
             color='DarkSlateGrey')
@@ -162,8 +162,8 @@ def tree_plot(T, pointsize=10, show_edges=True, show_nodes=True, show_leaves=Tru
     fig = go.Figure(data=res_data)
 
     fig.update_layout(
-        width=1500,
-        height=900,
+        width=plot_size[0],
+        height=plot_size[1],
         autosize=False,
         margin=dict(r=20, l=10, b=10, t=10),
         scene=dict(
