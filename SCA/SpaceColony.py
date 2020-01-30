@@ -17,18 +17,26 @@ log.setLevel(logging.DEBUG)
 
 class SpaceColony:
     def __init__(self,  points, roots=np.zeros((1,3)), 
-                        parameters=Param(r=0.04, iD=0.5, kD=0.2, bias=np.zeros(3)), 
-                        trunk_lim=1, min_activation=5, yeet_condition=5, maxsize=100000,  ncpu=cpu_count()):
+                        r=0.04, iD=0.5, kD=0.2, bias=np.zeros(3), 
+                        trunk_lim=1, min_activation=5, yeet_condition=5, 
+                        maxsize=100000,  ncpu=cpu_count(),
+                        log_stats=True):
 
         # Static information
-        self.par = parameters
-        self.ncpu = ncpu
-        self.min_activation = min_activation
+        self.r = r
+        self.iD = iD
+        self.kD = kD
+        self.bias = bias
+
         self.trunk_lim = trunk_lim
-        self.maxsize = maxsize
+        self.min_activation = min_activation
         self.yeet_condition = yeet_condition
+        
+        self.maxsize = maxsize
+        self.ncpu = ncpu
 
         self.nroots = len(roots)
+        self.log_stats = log_stats
 
         # Dynamic information
         self.age = 0
@@ -52,7 +60,7 @@ class SpaceColony:
         # This array is sliced at start:
         self.points = points
         
-        # This is sparta.
+        # Multiprocess parameters
         self.lock = Lock()
         A = np.zeros((self.maxsize, 3), dtype=roots.dtype)
         
@@ -135,7 +143,7 @@ class SpaceColony:
                 log.info('Halt condition: node vector full.')
                 self.done = True
                 return
-            self.nodes[self.end] = self.nodes[i] + (normalize(self.vectors[i]) + self.par.bias)*self.par.r
+            self.nodes[self.end] = self.nodes[i] + (normalize(self.vectors[i]) + self.bias)*self.r
             self.children[i].append(self.end)
             self.vectors[i] = np.zeros(3)
             self.end += 1
@@ -167,7 +175,9 @@ class SpaceColony:
                         self.children[i] = [c for c in self.children[i] if c <= self.end-1] 
 
                     self.age -= self.yeet_count
-                    self.stats = self.stats[:self.age]
+                    if self.log_stats:
+                        self.stats = self.stats[:self.age]
+                    
                     log.info(f'Halt condition: yeet count {self.yeet_count}.')
                     self.done = True
                     return True
@@ -198,10 +208,18 @@ class SpaceColony:
             
 
     def pack(self, points, pipe):
-        return points, self.par.iD, self.par.kD, self.vectors_sm.name, self.tree_sm.name, self.maxsize, pipe, self.lock
+        iD2 = self.iD**2
+        kD2 = self.kD**2
+        return  (points, iD2, kD2, 
+                self.vectors_sm.name, 
+                self.tree_sm.name, 
+                self.maxsize, 
+                pipe, 
+                self.lock)
     
     def update_stats(self):
-        self.stats.append(Stats(self.end, self.activation, self.reached_points))
+        if self.log_stats:
+            self.stats.append(Stats(self.end, self.activation, self.reached_points))
     
     def get_stats(self):
         return self.stats
@@ -216,11 +234,7 @@ class SpaceColony:
             if len(self.children[i]) == 0:
                 leaves += 1
 
-        return f'{self.end} nodes, {self.age} iterations \n\
-                {self.activation}/{len(self.points) - self.reached_points} active points \n\
-                Total {len(self.points)} points on {nproc}/{self.ncpu} processes \n\
-                avg. branching: {leaves/(self.end+1)} \n\
-                {self.par}'
+        return f'{self.end} nodes, {self.age} iterations \n{self.activation}/{len(self.points) - self.reached_points} active points \nTotal {len(self.points)} points on {nproc}/{self.ncpu} processes \n{self.nroots} trees. Avg. branching: {self.nroots*leaves/(self.end+1)} \nr={self.r}, iD={self.iD}, kD={self.kD}, bias={self.bias}'
 
     def __del__(self):
         log.debug('Delete SpaceColony')

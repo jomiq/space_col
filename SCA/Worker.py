@@ -4,23 +4,24 @@ from multiprocessing import Process, Pipe, Lock
 from .util import *
 
 class Horse(Process):
-    def __init__(self, points, iD, kD, vectors_UID, tree_UID, maxsize, pipe, lock, 
-        distance_function=(lambda v: np.sum(v**2)),
-        vector_function=(lambda p,n: p-n),
-        attractor_function=(lambda i,dv: normalize(dv))
+    def __init__(   self, 
+                    points, iD2, kD2, 
+                    vectors_UID, tree_UID, maxsize, pipe, lock, 
+                    distance_function=(lambda v: np.sum(v**2)),
+                    vector_function=(lambda p,n: p-n),
+                    attractor_function=(lambda i,dv: normalize(dv)),
+                    update_function=(lambda v: v)
         ):
         super(Horse, self).__init__()
         
         self.distance_function  = distance_function
         self.vector_function    = vector_function
         self.attractor_function = attractor_function 
+        self.update_function    = update_function
 
         self.points = points
-        self.iD = iD
-        self.kD = kD
-
-        self._iD = iD**2
-        self._kD = kD**2
+        self.iD2 = iD2
+        self.kD2 = kD2
 
         self.maxsize = maxsize
 
@@ -47,8 +48,13 @@ class Horse(Process):
             self.batch = self.pipe.recv()
             
         while self.batch.run:
-            res = self.compute(*self.batch.args)
-            self.pipe.send(res)
+            if self.batch.func == 1:
+                res = self.compute(*self.batch.args)
+                self.pipe.send(res)
+            if self.batch.func == 2:
+                res = self.update(*self.batch.args)
+                self.pipe.send(res)
+
             self.batch = self.pipe.recv()
         
         self.vectors_sm.close()
@@ -66,7 +72,7 @@ class Horse(Process):
                     dv = self.vector_function(p,n)
                     L = self.distance_function(dv)
                     
-                    if L < self._kD:
+                    if L < self.kD2:
                         self.reached_points += 1
                         self.reached_bool[i] = True
                         break
@@ -77,7 +83,7 @@ class Horse(Process):
                         self.dv[i] = dv
 
                 if not self.reached_bool[i]:                        
-                    if self.L[i] < self._iD:
+                    if self.L[i] < self.iD2:
                         active_points += 1
                         result.append(self.closest[i])
                         self.protected_add(self.closest[i], self.attractor_function(i, self.dv[i]))
@@ -87,6 +93,9 @@ class Horse(Process):
                         self.protected_add(self.closest[i], self.attractor_function(i, self.dv[i]))
                     
         return active_points, self.reached_points, result
+
+    def update(self):
+        pass
 
     def protected_add(self, node_idx, value):
         self.lock.acquire()
