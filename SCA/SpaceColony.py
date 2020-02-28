@@ -20,7 +20,7 @@ class SpaceColony:
                         r=0.04, iD=0.5, kD=0.2, bias=np.zeros(3), 
                         trunk_lim=1, min_activation=5, yeet_condition=5, 
                         maxsize=100000,  ncpu=cpu_count(),
-                        log_stats=True):
+                        log_stats=True, compute_mode=1):
 
         # Static information
         self.r = r
@@ -37,6 +37,7 @@ class SpaceColony:
 
         self.nroots = len(roots)
         self.log_stats = log_stats
+        self.compute_mode = compute_mode
 
         # Dynamic information
         self.age = 0
@@ -98,7 +99,7 @@ class SpaceColony:
                 break
                 
             for pipe in self.pipes:
-                pipe.send(Batch(True, 1, (self.start, self.end, self.trunk_mode)))
+                pipe.send(Batch(True, self.compute_mode, (self.start, self.end, self.trunk_mode)))
 
             result_list = [pipe.recv() for pipe in self.pipes]           
             res = self.collect(result_list)
@@ -140,7 +141,7 @@ class SpaceColony:
         self.start = self.end
         for i in res:
             if self.end >= self.maxsize:
-                log.info('Halt condition: node vector full.')
+                log.info(f'{self.age} Halt condition: node vector full.')
                 self.done = True
                 return
             self.nodes[self.end] = self.nodes[i] + (normalize(self.vectors[i]) + self.bias)*self.r
@@ -161,7 +162,7 @@ class SpaceColony:
                 log.info(f'Trunk mode disabled at {self.age} iterations.')
 
         if self.activation < self.min_activation:
-            log.info(f'Halt condition: activation < {self.min_activation}.')
+            log.info(f'{self.age} Halt condition: activation < {self.min_activation}.')
             self.done = True
             return True
 
@@ -178,7 +179,7 @@ class SpaceColony:
                     if self.log_stats:
                         self.stats = self.stats[:self.age]
                     
-                    log.info(f'Halt condition: yeet count {self.yeet_count}.')
+                    log.info(f'{self.age} Halt condition: yeet count {self.yeet_count}.')
                     self.done = True
                     return True
             else:

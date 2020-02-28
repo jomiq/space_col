@@ -52,7 +52,7 @@ class Horse(Process):
                 res = self.compute(*self.batch.args)
                 self.pipe.send(res)
             if self.batch.func == 2:
-                res = self.update(*self.batch.args)
+                res = self.compute_flex(*self.batch.args)
                 self.pipe.send(res)
 
             self.batch = self.pipe.recv()
@@ -61,6 +61,40 @@ class Horse(Process):
         self.tree_sm.close()
 
     def compute(self, start, end, trunk_mode):
+        active_points = 0
+        result = []
+        for i, p in enumerate(self.points):
+            if self.reached_bool[i]:
+                pass
+            else:
+                for j in range(start, end):
+                    n = self.nodes[j]
+                    dv = p-n
+                    L = np.sum(dv**2)
+                    
+                    if L < self.kD2:
+                        self.reached_points += 1
+                        self.reached_bool[i] = True
+                        break
+                        
+                    if L < self.L[i]:
+                        self.closest[i] = j
+                        self.L[i] = L
+                        self.dv[i] = dv
+
+                if not self.reached_bool[i]:                        
+                    if self.L[i] < self.iD2:
+                        active_points += 1
+                        result.append(self.closest[i])
+                        self.protected_add(self.closest[i], normalize(self.dv[i]))
+                    
+                    elif trunk_mode:
+                        result.append(self.closest[i])
+                        self.protected_add(self.closest[i], normalize(self.dv[i]))
+                    
+        return active_points, self.reached_points, result
+    
+    def compute_flex(self, start, end, trunk_mode):
         active_points = 0
         result = []
         for i, p in enumerate(self.points):

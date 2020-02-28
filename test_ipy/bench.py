@@ -1,5 +1,4 @@
-# %%
-
+# %% 
 from IPython import get_ipython
 
 import setpath
@@ -24,5 +23,20 @@ def prvec(axis=2, d=0):
     x = rvec()
     x[axis] = np.abs(x[axis]) + d
     return x
+
+# %%
+P = PG.sphere(N=1000)
+
+# %%
+T1 = SCA.SpaceColony(P, compute_mode=1)
+T2 = SCA.SpaceColony(P, compute_mode=2)
+# %%
+get_ipython().run_cell_magic('time', '', 'T1.iterate(800)\nT1.walk()')
+# %%
+get_ipython().run_cell_magic('time', '', 'T2.iterate(800)\nT2.walk()')
+
+# %%
+T_plot(T1, pointsize=25)
+
 
 # %%
