@@ -5,3 +5,4 @@ juputil/__pycache__/*
 juputil/.*
 test_ipy/.*
 .vscode/*
+test_ipy/__pycache__
