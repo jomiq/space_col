@@ -15,6 +15,8 @@ out_hdlr.setLevel(logging.DEBUG)
 log.addHandler(out_hdlr)
 log.setLevel(logging.DEBUG)
 
+
+'''Space colonization algorithm'''
 class SpaceColony:
     def __init__(self,  points, roots=np.zeros((1,3)), 
                         parameters=Param(r=0.04, iD=0.5, kD=0.2, bias=np.zeros(3)), 
@@ -67,7 +69,7 @@ class SpaceColony:
         for i in range(len(roots)):
             self.nodes[i] = roots[i]
 
-        # 'Pool'
+        # Explicit pool creation for better control
         point_slices = np.array_split(self.points, self.ncpu)
         self.workers = []
         self.pipes = []
@@ -157,6 +159,11 @@ class SpaceColony:
             self.done = True
             return True
 
+        # The yeet condition is basically to inhibit periodic behaviours from growing 
+        # the structure ad infinitum. It stops iterating if it detects that activation
+        # levels are not changing any more. There are some obvious corner cases to this,
+        # same numerical activation does not imply that the same set of attractors are 
+        # active, but in practice this method is fast and works well enough. 
         if self.age > self.yeet_condition:
             if np.abs(self.activation - self.stats[self.age-1].act) < 3:
                 self.yeet_count += 1
@@ -196,7 +203,7 @@ class SpaceColony:
         self.w[i] = w
         return w
             
-
+    # Use explicit packing/unpacking
     def pack(self, points, pipe):
         return points, self.par.iD, self.par.kD, self.vectors_sm.name, self.tree_sm.name, self.maxsize, pipe, self.lock
     

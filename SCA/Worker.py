@@ -3,6 +3,7 @@ from multiprocessing import Process, Pipe, Lock
 
 from .util import *
 
+# Implements iterations on a subset of the attractor. 
 class Horse(Process):
     def __init__(self, points, iD, kD, vectors_UID, tree_UID, maxsize, pipe, lock, 
         distance_function=(lambda v: np.sum(v**2)),

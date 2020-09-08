@@ -14,7 +14,7 @@ def normalize(v):
         return np.divide(v, d)
 
 
-
+'''Various random distributions in 3-space'''
 class PointGenerator:
     two_pi = 2*pi
 
@@ -46,7 +46,7 @@ class PointGenerator:
         return res
 
     '''Uniform distribution in (theta, phi).''' 
-    '''THe radial point density is gaussian.'''
+    '''The radial point density is gaussian.'''
     @classmethod
     def sphere_rad_gauss(cls, N=100, mu=0, sigma=0.1, C=vector(0,0,0)):
         phi = rand(N)*cls.two_pi
@@ -60,6 +60,7 @@ class PointGenerator:
             res[i,2] = r[i] * costheta[i] + C[2]
         return res
 
+    '''Uniform distribution on an arbritrary triangle.'''
     def triangular_uniform(p1, p2, p3, N=1000):
         R = rand(N,2)
         # Let 
