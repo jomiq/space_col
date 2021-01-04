@@ -184,6 +184,7 @@ class SpaceColony:
         
         return False
     
+    # Populate edge table
     def walk(self):
         self.w = np.ones(self.maxsize)
         self.edges = []
