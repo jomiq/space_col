@@ -5,7 +5,7 @@ The [space colonization algorithm](http://www.algorithmicbotany.org/papers/colon
 
 # Usage
 
-See jupiter examples and stress tests in `test_ipy/main.py`. There are plotting functions in the `juputil` folder. The [plotly](https://plotly.com) library is used. Use the `PointGenerator.py` class to generate different types of random distributions. Basic workflow:
+See Jupyter examples and stress tests in `test_ipy/main.py`. There are plotting functions in the `juputil` folder. The [plotly](https://plotly.com) library is used. Use the `PointGenerator.py` class to generate different types of random distributions. Basic workflow:
 
 ```
 import SCA
@@ -38,7 +38,7 @@ The thickness of branch node `n` is calculated from an observation made on actua
 
 The halt condition code deserves some explaining. `SpaceColony.done_yet()` keeps track of how many points are activated and terminates execution if activation has not changed for `yeet_condition` iterations. Sorry about the naming. This detects corner cases where branches are bouncing back-and-forth without ever reaching the `kD`region of an attraction point. 
 
-The `Horse` (sorry) process can be coerced into using arbritrary functions for distance calculations and the attractiveness of the attractor. The default behaviour is square euclidean distance, but stuff like Manhattan distance could be interesting. Similarily `SpaceColony` accepts a `grow_function` of a single 3D vector. See `test_manhattan.py` for some examples. 
+The `Horse` (sorry) process can be coerced into using arbritrary functions for distance calculations and the attractiveness of the attractor. The default behaviour is square euclidean distance, but stuff like Manhattan distance could be interesting. Similarily `SpaceColony` accepts a `grow_function` of a single 3D vector. See `test_manhattan.py` for an example. 
 
 # Status
  This code could eventually be turned into a Blender plugin. For now I just leave it here, waiting for Blender to bump to a newer interpreter. Work should be done to sure make the worker `run()` method proper re-entrant. 
