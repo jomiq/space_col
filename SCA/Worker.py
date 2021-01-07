@@ -8,20 +8,21 @@ class Horse(Process):
     def __init__(self, points, iD, kD, vectors_UID, tree_UID, maxsize, pipe, lock, 
         distance_function=(lambda v: np.sum(v**2)),
         vector_function=(lambda p,n: p-n),
-        attractor_function=(lambda i,dv: normalize(dv))
+        square_distances=True
         ):
         super(Horse, self).__init__()
         
         self.distance_function  = distance_function
         self.vector_function    = vector_function
-        self.attractor_function = attractor_function 
 
         self.points = points
-        self.iD = iD
-        self.kD = kD
 
-        self._iD = iD**2
-        self._kD = kD**2
+        if square_distances:
+            self.iD = iD**2
+            self.kD = kD**2
+        else:
+            self.iD = iD
+            self.kD = kD
 
         self.maxsize = maxsize
 
@@ -67,7 +68,7 @@ class Horse(Process):
                     dv = self.vector_function(p,n)
                     L = self.distance_function(dv)
                     
-                    if L < self._kD:
+                    if L < self.kD:
                         self.reached_points += 1
                         self.reached_bool[i] = True
                         break
@@ -78,18 +79,19 @@ class Horse(Process):
                         self.dv[i] = dv
 
                 if not self.reached_bool[i]:                        
-                    if self.L[i] < self._iD:
+                    if self.L[i] < self.iD:
                         active_points += 1
                         result.append(self.closest[i])
-                        self.protected_add(self.closest[i], self.dv[i]))
+                        self.protected_add(self.closest[i], self.dv[i], self.L[i])
                     
                     elif trunk_mode:
                         result.append(self.closest[i])
-                        self.protected_add(self.closest[i], self.dv[i]))
+                        self.protected_add(self.closest[i], self.dv[i], self.L[i])
                     
         return active_points, self.reached_points, result
 
-    def protected_add(self, node_idx, value):
+    def protected_add(self, node_idx, value, length):
         self.lock.acquire()
-        self.vectors[node_idx] += value
+        if length < self.distance_function(self.vectors[node_idx]):
+            self.vectors[node_idx] = value
         self.lock.release()

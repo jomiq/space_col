@@ -57,7 +57,7 @@ T_plot(T, pointsize=20)
 
 
 # %%
-T_plot(T, decimate=True)
+S_plot(T)
 
 
 # %%
@@ -147,9 +147,10 @@ T_plot(T, decimate=True)
 S_plot(T, normal_to_size=True)
 
 # %%
+
 pts = PG.sphere(N=800,R=1.0, C=vec(0,0,1.5))
 par = Param(0.03, 0.8, 0.1, vec(0,0,0.1))
-T = SCA.SpaceColony(points=pts, parameters=par, trunk_lim=10)
+T = SCA.SpaceColony(points=pts, parameters=par, trunk_lim=10,)
 
 
 # %%

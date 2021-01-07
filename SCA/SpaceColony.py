@@ -20,7 +20,8 @@ log.setLevel(logging.DEBUG)
 class SpaceColony:
     def __init__(self,  points, roots=np.zeros((1,3)), 
                         parameters=Param(r=0.04, iD=0.5, kD=0.2, bias=np.zeros(3)), 
-                        trunk_lim=1, min_activation=5, yeet_condition=5, maxsize=100000,  ncpu=cpu_count()):
+                        trunk_lim=1, min_activation=5, yeet_condition=5, maxsize=100000,  ncpu=cpu_count(),
+                        grow_function=(lambda v: normalize(v))):
 
         # Static information
         self.par = parameters
@@ -29,6 +30,7 @@ class SpaceColony:
         self.trunk_lim = trunk_lim
         self.maxsize = maxsize
         self.yeet_condition = yeet_condition
+        self.grow_function = grow_function
 
         self.nroots = len(roots)
 
@@ -56,7 +58,7 @@ class SpaceColony:
         
         # This is sparta.
         self.lock = Lock()
-        A = np.zeros((self.maxsize, 3), dtype=roots.dtype)
+        A = np.inf*np.ones((self.maxsize, 3), dtype=roots.dtype)
         
         self.vectors_sm = SharedMemory(create=True, size=A.nbytes)
         self.tree_sm = SharedMemory(create=True, size=A.nbytes)
@@ -137,9 +139,9 @@ class SpaceColony:
                 log.info('Halt condition: node vector full.')
                 self.done = True
                 return
-            self.nodes[self.end] = self.nodes[i] + (normalize(self.vectors[i]) + self.par.bias)*self.par.r
+            self.nodes[self.end] = self.nodes[i] + (self.grow_function(self.vectors[i]) + self.par.bias)*self.par.r
             self.children[i].append(self.end)
-            self.vectors[i] = np.zeros(3)
+            self.vectors[i] = np.ones(3)*np.inf
             self.end += 1
         
 
