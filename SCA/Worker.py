@@ -81,11 +81,11 @@ class Horse(Process):
                     if self.L[i] < self._iD:
                         active_points += 1
                         result.append(self.closest[i])
-                        self.protected_add(self.closest[i], self.attractor_function(i, self.dv[i]))
+                        self.protected_add(self.closest[i], self.dv[i]))
                     
                     elif trunk_mode:
                         result.append(self.closest[i])
-                        self.protected_add(self.closest[i], self.attractor_function(i, self.dv[i]))
+                        self.protected_add(self.closest[i], self.dv[i]))
                     
         return active_points, self.reached_points, result
 

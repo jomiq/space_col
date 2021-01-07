@@ -44,12 +44,15 @@ r0[:,2] = 0
 par = Param(r=0.03, kD=0.07, iD=0.2, bias=vec(0,0,0.9))
 T = SCA.SpaceColony(points=pts, roots=r0, parameters=par, min_activation=5, trunk_lim=10, yeet_condition=20)
 
+# %%
+T.iterate(80)
 
 # %%
 get_ipython().run_cell_magic('time', '', 'T.iterate(80)\nT.walk()')
 
 
 # %%
+T.walk()
 T_plot(T, pointsize=20)
 
 
@@ -143,3 +146,17 @@ T_plot(T, decimate=True)
 # %%
 S_plot(T, normal_to_size=True)
 
+# %%
+pts = PG.sphere(N=800,R=1.0, C=vec(0,0,1.5))
+par = Param(0.03, 0.8, 0.1, vec(0,0,0.1))
+T = SCA.SpaceColony(points=pts, parameters=par, trunk_lim=10)
+
+
+# %%
+T.iterate(6000)
+# %%
+S_plot(T)
+# %%
+T.walk()
+T_plot(T)
+# %%
