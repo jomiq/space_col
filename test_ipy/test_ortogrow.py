@@ -31,14 +31,15 @@ def prvec(axis=2, d=0):
 # %%
 
 # %%
+'''Produces the closest unit vector'''
 def grow_max(v):
     i = np.where(abs(v)==np.amax(np.abs(v)))[0]
     res = np.zeros(3)
     res[i] = 1.0*float(np.sign(v[i]))
     return res
 
-pts = PG.sphere(N=80,R=1.0, C=vec(0,0,1.5))
-par = Param(0.1, 0.5, 0.1, vec(0,0,0))
+pts = PG.sphere(N=700,R=1.0, C=vec(0,0,1.5))
+par = Param(0.1, 0.5, 0.1, vec(0,0,0.5))
 T = SCA.SpaceColony(points=pts, parameters=par, trunk_lim=10, grow_function=grow_max)
 
 
