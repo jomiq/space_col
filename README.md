@@ -5,7 +5,7 @@ The [space colonization algorithm](http://www.algorithmicbotany.org/papers/colon
 
 # Usage
 
-See jupiter examples and stress tests in `test_ipy/main.py`. There are plotting functions in the `juputil` folder. The [plotly](https://plotly.com) library is used. Use the `PointGenerator.py` class to generate different types of random distributions. Basic workflow:
+See Jupyter examples and stress tests in `test_ipy/main.py`. There are plotting functions in the `juputil` folder. The [plotly](https://plotly.com) library is used. Use the `PointGenerator.py` class to generate different types of random distributions. Basic workflow:
 
 ```
 import SCA

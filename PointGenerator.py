@@ -61,6 +61,7 @@ class PointGenerator:
         return res
 
     '''Uniform distribution on an arbritrary triangle.'''
+    @classmethod
     def triangular_uniform(p1, p2, p3, N=1000):
         R = rand(N,2)
         # Let 
